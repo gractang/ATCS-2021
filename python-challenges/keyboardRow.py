@@ -5,6 +5,25 @@ THIRD = {'x','c','v','b','n','m','Z','X','C','V','B','N','M'}
 def findWords(words):
 	words_that_work = []
 	for word in words:
+		first_letter = word[0]
+		works = True
+		for i in range(1, len(word)):
+			if (word[i] in FIRST and first_letter in SECOND) or (word[i] in FIRST and first_letter in THIRD):
+				works = False
+			elif (word[i] in SECOND and first_letter in FIRST) or (word[i] in SECOND and first_letter in THIRD):
+				works = False
+			elif (word[i] in THIRD and first_letter in FIRST) or (word[i] in THIRD and first_letter in SECOND):
+				works = False
+			if not works:
+				break
+		if works:
+			words_that_work.append(word)
+	return words_that_work
+
+
+def findWordsBad(words):
+	words_that_work = []
+	for word in words:
 		status = [0,0,0]
 		for letter in word:
 			if letter in FIRST:
