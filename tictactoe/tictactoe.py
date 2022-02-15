@@ -101,8 +101,55 @@ class TicTacToe:
                         self.board[row][col] = '-'
             return (best, opt_row, opt_col)
 
+    # assumes bot is O (player 1)
+    # initial param depth is how many levels down to look
+    # returns tuple (score, row, col) at optimal move
+    def minimax_depth(self, player, depth):
+        if self.check_win(0):
+            return (-1, None, None)
+        if self.check_win(1):
+            return (1, None, None)
+        if self.check_tie():
+            return (0, None, None)
+        if depth == 0:
+            return (0, None, None)
+        # person sim
+        if player == 0:
+            worst = 1
+            opt_row = -1
+            opt_col = -1
+            # iterate through all available moves
+            for row in range(3):
+                for col in range(3):
+                    if self.is_valid_move(row, col):
+                        self.place_player(0, row, col)
+                        score = self.minimax_depth(1, depth-1)[0]
+                        if score < worst:
+                            worst = score
+                            opt_row = row
+                            opt_col = col
+                        self.board[row][col] = '-'
+            return (worst, opt_row, opt_col)
+        # bot sim
+        if player == 1:
+            best = -1
+            opt_row = -1
+            opt_col = -1
+            # iterate through all available moves
+            for row in range(3):
+                for col in range(3):
+                    if self.is_valid_move(row, col):
+                        self.place_player(1, row, col)
+                        score = self.minimax_depth(0, depth-1)[0]
+                        if score > best:
+                            best = score
+                            opt_row = row
+                            opt_col = col
+                        self.board[row][col] = '-'
+            return (best, opt_row, opt_col)
+
     def take_minimax_turn(self, player):
-        score, row, col = self.minimax(player)
+        score, row, col = self.minimax_depth(player, 2)
         self.place_player(player, row, col)
 
     def take_turn(self, player):
