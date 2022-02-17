@@ -1,5 +1,5 @@
 import random
-
+import time
 
 class TicTacToe:
     def __init__(self):
@@ -68,7 +68,7 @@ class TicTacToe:
             return (0, None, None)
         # person sim
         if player == 0:
-            worst = 1
+            worst = 10
             opt_row = -1
             opt_col = -1
             # iterate through all available moves
@@ -85,7 +85,7 @@ class TicTacToe:
             return (worst, opt_row, opt_col)
         # bot sim
         if player == 1:
-            best = -1
+            best = -10
             opt_row = -1
             opt_col = -1
             # iterate through all available moves
@@ -115,7 +115,7 @@ class TicTacToe:
             return (0, None, None)
         # person sim
         if player == 0:
-            worst = 1
+            worst = 10
             opt_row = -1
             opt_col = -1
             # iterate through all available moves
@@ -132,7 +132,7 @@ class TicTacToe:
             return (worst, opt_row, opt_col)
         # bot sim
         if player == 1:
-            best = -1
+            best = -10
             opt_row = -1
             opt_col = -1
             # iterate through all available moves
@@ -148,8 +148,65 @@ class TicTacToe:
                         self.board[row][col] = '-'
             return (best, opt_row, opt_col)
 
+    def minimax_alpha_beta(self, player, depth, alpha, beta):
+        if self.check_win(0):
+            return (-1, None, None)
+        if self.check_win(1):
+            return (1, None, None)
+        if self.check_tie():
+            return (0, None, None)
+        if depth == 0:
+            return (0, None, None)
+        # person sim
+        if player == 0:
+            worst = 10
+            opt_row = -1
+            opt_col = -1
+            # iterate through all available moves
+            for row in range(3):
+                for col in range(3):
+                    if self.is_valid_move(row, col):
+                        self.place_player(0, row, col)
+                        score = self.minimax_alpha_beta(1, depth-1, alpha, beta)[0]
+                        if score < worst:
+                            worst = score
+                            opt_row = row
+                            opt_col = col
+                        self.board[row][col] = '-'
+                        beta = min(beta, worst)
+                        if beta <= alpha:
+                            break                  
+            
+            return (worst, opt_row, opt_col)
+        # bot sim
+        if player == 1:
+            best = -10
+            opt_row = -1
+            opt_col = -1
+            # iterate through all available moves
+            for row in range(3):
+                for col in range(3):
+                    if self.is_valid_move(row, col):
+                        self.place_player(1, row, col)
+                        score = self.minimax_alpha_beta(0, depth-1, alpha, beta)[0]
+                        if score > best:
+                            best = score
+                            opt_row = row
+                            opt_col = col
+                        self.board[row][col] = '-'
+                        alpha = max(alpha, best)
+                        if beta <= alpha:
+                            break
+                        
+            return (best, opt_row, opt_col)
+
     def take_minimax_turn(self, player):
-        score, row, col = self.minimax_depth(player, 2)
+        start = time.time()
+        score, row, col = self.minimax_alpha_beta(player, 2, -10, 10)
+        #score, row, col = self.minimax_depth(player, 2)
+        #score, row, col = self.minimax(player)
+        end = time.time()
+        print("This turn took:", end - start, "seconds")  
         self.place_player(player, row, col)
 
     def take_turn(self, player):
